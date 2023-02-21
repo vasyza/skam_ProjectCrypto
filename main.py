@@ -19,9 +19,11 @@ mysqli_name = "u1929057_oreders_bd"
 mysqli_login = "u1929057_default"
 mysqli_password = "kHtnpSj78FBW6s1t"
 
-connection = mysql.connector.connect(host=mysqli_host, user=mysqli_login, passwd=mysqli_password,
-                                     database=mysqli_name)
-cursor = connection.cursor()
+def create_connection():
+    connection = mysql.connector.connect(host=mysqli_host, user=mysqli_login, passwd=mysqli_password,
+                                         database=mysqli_name)
+    cursor = connection.cursor()
+    return cursor, connection
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -209,6 +211,8 @@ async def process_callback_accept_rules(callback_query: CallbackQuery, state: FS
     user_state = dp.current_state(chat=user_id, user=user_id)
     referral_code = static_functions.generate_referral_code()
     user_data = await user_state.get_data()
+
+    cursor, connection = create_connection()
 
     cursor.execute(f"INSERT INTO workers VALUES ('{referral_code}', '{user_id}');")
     connection.commit()
